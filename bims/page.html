@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>欢迎进入信息界面</title>
+</head>
+
+<body>
+	
+	<h1 align="center">配送员信息</h1>
+	<form action="" method="post" name="indexf">
+		<p align="center"><input type="button" value="新增" name="inbut" onClick="location.href='5.28insert.php'"/></p>
+		<p align="center"><input type="text" name="sel"/><input type="submit" value="搜索" name="selsub"/></p>
+			<table align="center" border="1px" cellspacing="0px" width="800px">
+				<tr><th>配送员序号</th><th>配送员电话</th><th>姓名</th><th>等级</th></tr>
+		<?php
+		    session_start();
+		    if(isset($_SESSION['yes'])){
+		    	echo '<p align="center">'.$_SESSION['success'].'</p>';
+		    	unset($_SESSION['success']);
+		    }
+			$link = mysqli_connect('localhost','root','password','test_table','3306');
+			if (!$link){
+				exit('数据库连接失败！');
+			}
+			if (empty($_POST["selsub"])){
+				$res =mysqli_query($link,"select * from delivery order by dno");
+			}else{
+				$sel = $_POST["sel"];
+				$res =mysqli_query($link,"select * from students where dno like '%$sel%' or delivery_name like '%$sel%' or dgrade like '%$sel%' or delivery_tel like '%$sel%'");
+			}
+			while($row = mysqli_fetch_array($res)){
+				echo '<tr align="center">';
+					echo "<td>$row[0]</td>
+					      <td>$row[1]</td>
+					      <td>$row[2]</td>
+					      <td>$row[3]</td>
+					      <td>
+					      	<input type='submit' name='upsub$row[0]' value='修改' />
+					      	<input type='submit' name='delsub$row[0]' value='删除' />
+					      </td>";
+				echo '</tr>';
+				if (!empty($_POST["upsub$row[0]"])) {
+					echo '<tr align="center">';
+					echo " <td>$row[0]</td>
+					       <td><input type='text' name='upsn' value='$row[1]'/></td>
+					       <td><input type='text' name='upss' value='$row[2]'/></td>
+					       <td><input type='text' name='upsa' value='$row[3]'/></td>
+					       <td><input type='submit' name='upsubs$row[0]' value='确认修改' /></td>";
+					echo '</tr>';
+				}
+				if (!empty($_POST["upsubs$row[0]"])){
+					$upsn=$_POST['upsn'];
+					$upss=$_POST['upss'];
+					$upsa=$_POST['upsa'];
+					mysqli_query($link,"update delivery set delivery_tel='$upsn',delivery_name='$upss',dgrade=$upsa where dno=$row[0]");
+					header('location:#');
+				}
+ 				 if (!empty($_POST["delsub$row[0]"])){
+					$_SESSION['del']=$row[0];
+					echo '<script>
+							if(confirm("是不是要删除?")==true){
+								location.href="del.php/5.28.php?";
+							}
+							</script>';
+				}
+			}
+	mysqli_close($link);
+?>
+		</table>
+	</form>
+</body>
+</html>
