@@ -1,2 +1,2 @@
 from .BaseConfig import client
-from .BaseConfig import database
+from .BaseConfig import databases

@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 import json
-from example_pkg.click_house import client, database
+from example_pkg.click_house import databases
 from example_pkg.Redis import RedisModel
 from .modules import Response
 
@@ -15,14 +15,12 @@ SocketTimeoutError：端口错误
 '''
 
 
-# response = {}
-
-
 @db_operate.post('.datasource/list')
 async def data_source(host: str, port: int, user: str, password: str):
     try:
-        clients = client(host=host, port=port, user=user, password=password)
-        clients.connect()
+        databases(host=host, port=port, user=user, password=password)
+        # clients = client(host=host, port=port, user=user, password=password)
+        # clients.connect()
         response = Response(data={"dataSourceName": "ClickHouse", "dataSourceType": "click_house"}).return_response()
         user_data = {"host": host, "port": port, "user": user, "password": password, "dataSourceType": "click_house"}
         RedisModel().set_data("user_data", json.dumps(user_data))
@@ -45,8 +43,9 @@ async def get_database(dataSourType: str):
             port = user_data.get('port')
             password = user_data.get('password')
             user = user_data.get('user')
-            databases = database(host=host, port=port, user=user, password=password).GetDatabase()
-            response = Response(data=databases).return_response()
+            clients = databases(host=host, port=port, user=user, password=password)
+            database = clients.GetDatabase()
+            response = Response(data=database).return_response()
             return response
         except:
             response = Response(data=None, msg='fail', code=110).return_response()
@@ -58,7 +57,20 @@ async def get_database(dataSourType: str):
 
 @db_operate.post('.table/list')
 async def get_list(dataSourType: str, dbName: str):
-    pass
+    user_data = json.loads(RedisModel().get_data("user_data").get("result"))
+    if dataSourType == user_data.get("dataSourceType"):
+        try:
+            host = user_data.get('host')
+            port = user_data.get('port')
+            password = user_data.get('password')
+            user = user_data.get('user')
+            clients = databases(host=host, port=port, user=user, password=password)
+            tables = clients.GetTable(dbName)
+            response = Response(data=tables).return_response()
+            return response
+        except:
+            response = Response(data=None, msg='fail', code=110).return_response()
+            return response
 
 
 '''表的schema'''
