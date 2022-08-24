@@ -36,4 +36,4 @@ BI_system.include_router(other_operate.other_operate, prefix='/api/v1', tags=['å
 
 
 if __name__ == '__main__':
-    uvicorn.run('start:BI_system', host='127.0.0.1', port=9001, reload=True, debug=1, workers=1)
+    uvicorn.run('start:BI_system', host='127.0.0.1', port=8001, reload=True, debug=1, workers=1)

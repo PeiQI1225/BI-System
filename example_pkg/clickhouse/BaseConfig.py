@@ -2,7 +2,7 @@ from clickhouse_driver import Client
 
 
 class client:
-    def __init__(self, host, password, user='default', port=8123):
+    def __init__(self, host, password, user='default', port=9000):
         self.host = host
         self.port = port
         self.user = user
@@ -28,7 +28,10 @@ class database(client):
         self.database = database
 
     def GetDatabase(self):
-        pass
+        client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
+        sql = 'show database'
+        databases = client.execute(sql)
 
 
-clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225")
+clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225", )
+print(clients.connect())
