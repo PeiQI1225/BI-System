@@ -1,4 +1,5 @@
 from clickhouse_driver import Client
+from example_pkg.Redis.redisService import RedisModel
 
 
 class client:
@@ -24,14 +25,16 @@ class client:
 
 
 class database(client):
-    def __init__(self, database):
-        self.database = database
 
     def GetDatabase(self):
-        client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
-        sql = 'show database'
-        databases = client.execute(sql)
+        print(RedisModel().get_data("user_data"))
+        # user_data.get("user")
+        # client = Client()
+        # sql = 'show databases'
+        # databases = client.execute(sql)
+        # return databases
+        return 1
 
 
-clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225", )
-print(clients.connect())
+# clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225", )
+# print(clients.connect())

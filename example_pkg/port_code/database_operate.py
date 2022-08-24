@@ -1,9 +1,9 @@
 """数据库操作相关接口"""
 
 from fastapi import APIRouter
-from clickhouse_driver import Client
-
-from clickhouse import client
+import json
+from example_pkg.click_house import client, database
+from example_pkg.Redis import RedisModel
 
 db_operate = APIRouter()
 
@@ -24,6 +24,8 @@ async def data_source(host: str, port: int, user: str, password: str):
         response['data'] = [{"dataSourceName": "ClickHouse", "dataSourceType": "click_house"}]
         response['msg'] = 'success'
         response['code'] = 0
+        user_data = {"host": host, "port": port, "user": user, "password": password, "dataSourceType": "click_house"}
+        RedisModel().set_data("user_data", json.dumps(user_data))
         return response
     except:
         response['data'] = None
@@ -37,7 +39,22 @@ async def data_source(host: str, port: int, user: str, password: str):
 
 @db_operate.post('.db/list')
 async def get_database(dataSourType: str):
-    pass
+    user_data = json.loads(RedisModel().get_data("user_data").get("result"))
+    if dataSourType == user_data.get("dataSourceType"):
+        try:
+
+            databases = database().GetDatabase()
+
+            
+            response['data'] = databases
+            response['msg'] = 'success'
+            response['code'] = 0
+            return response
+        except:
+            response['data'] = None
+            response['msg'] = '连接失败'
+            response['code'] = 110
+            return response
 
 
 '''数据库下的表'''
