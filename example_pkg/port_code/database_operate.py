@@ -4,6 +4,7 @@ from fastapi import APIRouter
 import json
 from example_pkg.click_house import client, database
 from example_pkg.Redis import RedisModel
+from .modules import Response
 
 db_operate = APIRouter()
 
@@ -13,7 +14,8 @@ ServerException：密码错误/用户名错误
 SocketTimeoutError：端口错误
 '''
 
-response = {}
+
+# response = {}
 
 
 @db_operate.post('.datasource/list')
@@ -21,16 +23,12 @@ async def data_source(host: str, port: int, user: str, password: str):
     try:
         clients = client(host=host, port=port, user=user, password=password)
         clients.connect()
-        response['data'] = [{"dataSourceName": "ClickHouse", "dataSourceType": "click_house"}]
-        response['msg'] = 'success'
-        response['code'] = 0
+        response = Response(data={"dataSourceName": "ClickHouse", "dataSourceType": "click_house"}).return_response()
         user_data = {"host": host, "port": port, "user": user, "password": password, "dataSourceType": "click_house"}
         RedisModel().set_data("user_data", json.dumps(user_data))
         return response
     except:
-        response['data'] = None
-        response['msg'] = '连接失败'
-        response['code'] = 110
+        response = Response(data=None, msg='fail', code=110).return_response()
         return response
 
 
@@ -42,18 +40,16 @@ async def get_database(dataSourType: str):
     user_data = json.loads(RedisModel().get_data("user_data").get("result"))
     if dataSourType == user_data.get("dataSourceType"):
         try:
-
-            databases = database().GetDatabase()
-
-            
-            response['data'] = databases
-            response['msg'] = 'success'
-            response['code'] = 0
+            # 数据拆分
+            host = user_data.get('host')
+            port = user_data.get('port')
+            password = user_data.get('password')
+            user = user_data.get('user')
+            databases = database(host=host, port=port, user=user, password=password).GetDatabase()
+            response = Response(data=databases).return_response()
             return response
         except:
-            response['data'] = None
-            response['msg'] = '连接失败'
-            response['code'] = 110
+            response = Response(data=None, msg='fail', code=110).return_response()
             return response
 
 

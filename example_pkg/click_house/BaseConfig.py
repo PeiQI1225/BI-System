@@ -20,20 +20,17 @@ class client:
         """
         client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
         sql = 'show databases'
-        res = client.execute(sql)
-        return res
+        database = client.execute(sql)
+        return database
 
 
 class database(client):
 
     def GetDatabase(self):
-        print(RedisModel().get_data("user_data"))
-        # user_data.get("user")
-        # client = Client()
-        # sql = 'show databases'
-        # databases = client.execute(sql)
-        # return databases
-        return 1
+        client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
+        sql = 'show databases'
+        databases = client.execute(sql)
+        return databases
 
 
 # clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225", )

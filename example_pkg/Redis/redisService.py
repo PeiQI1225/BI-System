@@ -1,6 +1,3 @@
-import json
-
-from .Redis_Config import Strict_Redis
 
 import redis
 
