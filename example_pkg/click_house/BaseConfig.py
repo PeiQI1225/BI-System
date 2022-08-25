@@ -35,18 +35,25 @@ class databases(client):
         return databases
 
     def GetTable(self, database):
-        client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
+        # client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
         sql = f'show tables in {database}'
-        tables = client.execute(sql)
+        tables = self.client.execute(sql)
         return tables
 
     def Getschema(self, database, table):
-        client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
-        sql = f'show tables in {database}'
-        tables = client.execute(sql)
-        return tables
+        # client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
+        # select distinct column from system.parts_columns where database='dbup' and table='cdf_stock'
+        sql = f"select name from system.columns where database='{database}' and table='{table}'"
+        schema = self.client.execute(sql)
+        return schema
+
+    def Gettabledata(self, database, table, schema):
+        sql = f"select {schema} From {database}.{table}"
+        tabledata = self.client.execute(sql)
+        return tabledata
 
 
 # a = databases(host="139.224.74.8", port=9000, user="default", password="2001G1225")
+# a.Gettabledata(database='dbup', table='cfd_stocks')
 # clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225", )
 # print(clients.connect())

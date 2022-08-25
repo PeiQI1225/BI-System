@@ -4,7 +4,7 @@ from fastapi import APIRouter
 import json
 from example_pkg.click_house import databases
 from example_pkg.Redis import RedisModel
-from .modules import Response
+from modules.Responsemodule import Response
 
 db_operate = APIRouter()
 
@@ -34,9 +34,9 @@ async def data_source(host: str, port: int, user: str, password: str):
 
 
 @db_operate.post('.db/list')
-async def get_database(dataSourType: str):
+async def get_database(dataSourceType: str):
     user_data = json.loads(RedisModel().get_data("user_data").get("result"))
-    if dataSourType == user_data.get("dataSourceType"):
+    if dataSourceType == user_data.get("dataSourceType"):
         try:
             # 数据拆分
             host = user_data.get('host')
@@ -56,9 +56,9 @@ async def get_database(dataSourType: str):
 
 
 @db_operate.post('.table/list')
-async def get_list(dataSourType: str, dbName: str):
+async def get_list(dataSourceType: str, dbName: str):
     user_data = json.loads(RedisModel().get_data("user_data").get("result"))
-    if dataSourType == user_data.get("dataSourceType"):
+    if dataSourceType == user_data.get("dataSourceType"):
         try:
             host = user_data.get('host')
             port = user_data.get('port')
@@ -77,5 +77,18 @@ async def get_list(dataSourType: str, dbName: str):
 
 
 @db_operate.post('.table/schema')
-async def table_schema(dataSourType: str, dbName: str, tableName):
-    pass
+async def table_schema(dataSourceType: str, dbName: str, tableName: str):
+    user_data = json.loads(RedisModel().get_data("user_data").get("result"))
+    if dataSourceType == user_data.get("dataSourceType"):
+        try:
+            host = user_data.get('host')
+            port = user_data.get('port')
+            password = user_data.get('password')
+            user = user_data.get('user')
+            clients = databases(host=host, port=port, user=user, password=password)
+            schemas = clients.Getschema(database=dbName, table=tableName)
+            response = Response(data=schemas).return_response()
+            return response
+        except:
+            response = Response(data=None, msg='fail', code=110).return_response()
+            return response
