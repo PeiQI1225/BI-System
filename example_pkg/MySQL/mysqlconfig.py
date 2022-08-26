@@ -37,20 +37,30 @@ def insertdata(name: str, descr: str, dataSourceType: str, dbName: str, tableNam
 
 
 def getdataSetList(orderBy: str, order: str, page: int, pageSize: int, creatUser: str, keyword: str):
-    sql = f"SELECT * FROM data_set where create_user = '{creatUser}' and descr like '%{keyword}%' or name like '%{keyword}%' order by {orderBy},{order} LIMIT {(page - 1) * pageSize},{pageSize}; "
-    cursor.execute(sql)
-    return cursor.fetchall()
+    try:
+        sql = f"SELECT * FROM data_set where create_user = '{creatUser}' and descr like '%{keyword}%' or name like '%{keyword}%' order by {orderBy},{order} LIMIT {(page - 1) * pageSize},{pageSize}; "
+        cursor.execute(sql)
+        conn.commit()
+        return cursor.fetchall()
+    except:
+        conn.rollback()
+        return None
 
 
 def gettotalCount(creatUser: str, keyword: str):
-    sql = f"SELECT COUNT(*) FROM data_set where create_user = '{creatUser}' and descr like '%{keyword}%' or name like '%{keyword}%';"
-    cursor.execute(sql)
-    number = cursor.fetchall()
-    count = number[0]['COUNT(*)']
-    return count
+    try:
+        sql = f"SELECT COUNT(*) FROM data_set where create_user = '{creatUser}' and descr like '%{keyword}%' or name like '%{keyword}%';"
+        cursor.execute(sql)
+        number = cursor.fetchall()
+        count = number[0]['COUNT(*)']
+        conn.commit()
+        return count
+    except:
+        conn.rollback()
+        return None
 
 
-def deletedataSet(id:int):
+def deletedataSet(id: int):
     try:
         sql = f'DELETE FROM data_set WHERE id={id};'
         cursor.execute(sql)
@@ -59,3 +69,19 @@ def deletedataSet(id:int):
     except:
         conn.rollback()
         return False
+
+
+def getschema(dataSetId):
+    try:
+        sql = f"select schema_data from data_set where id = {dataSetId};"
+        cursor.execute(sql)
+        schema = cursor.fetchall()
+        conn.commit()
+    except:
+        conn.rollback()
+        schema = None
+    # 查看更新后的结果
+    return schema
+
+
+print((getschema(25)[0]['schema_data']))

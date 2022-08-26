@@ -42,18 +42,32 @@ class databases(client):
 
     def Getschema(self, database, table):
         # client = Client(host=self.host, port=self.port, user=self.user, password=self.password)
-        # select distinct column from system.parts_columns where database='dbup' and table='cdf_stock'
-        sql = f"select name from system.columns where database='{database}' and table='{table}'"
-        schema = self.client.execute(sql)
-        return schema
+        sql = f"select name,type,comment from system.columns where database='{database}' and table='{table}'"
+        # sql = f"select partition  from system.parts WHERE table='cfd_stocks'"
+        schemalist = self.client.execute(sql)
+        datalist = []
+        for i in schemalist:
+            i = list(i)
+            schema = {}
+            schema['name'] = i[0]
+            schema['type'] = i[1]
+            schema['descr'] = i[2]
+            if i[0] in self.client.execute(f"select partition  from system.parts WHERE table='{table}'"):
+                schema['ispartition'] = True
+            else:
+                schema['ispartition'] = False
+            datalist.append(schema)
+        return datalist
 
-    def Gettabledata(self, database, table, schema):
-        sql = f"select {schema} From {database}.{table}"
-        tabledata = self.client.execute(sql)
-        return tabledata
+    # def Gettabledata(self, database, table, schema):
+    #     sql = f"select {schema} From {database}.{table}"
+    #     tabledata = self.client.execute(sql)
+    #     return tabledata
 
-
+#
 # a = databases(host="139.224.74.8", port=9000, user="default", password="2001G1225")
+# print(a.Getschema(database='dbup', table='check'))
 # a.Gettabledata(database='dbup', table='cfd_stocks')
 # clients = client(host="139.224.74.8", port=9000, user="default", password="2001G1225", )
 # print(clients.connect())
+# create table dbup.visits(userid int,visitdate date,website String) engine=MergeTree() PARTITION BY toYYYYMM(visitdate) order by userid;
