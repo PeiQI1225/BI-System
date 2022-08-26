@@ -1,3 +1,5 @@
+import json
+
 import pymysql
 import random
 import time
@@ -21,7 +23,7 @@ def insertdata(name: str, descr: str, dataSourceType: str, dbName: str, tableNam
                createUser: str):
     app_id = random.randrange(1, 100)
     insert_time = time.mktime(time.localtime())
-    sql = f'INSERT data_set VALUES(Null,{app_id},"{name}","{descr}","{dataSourceType}","{dbName}","{tableName}","{schema}","{createUser}",Null,{insert_time},Null,0);'
+    sql = f"INSERT data_set VALUES(Null,{app_id},'{name}','{descr}','{dataSourceType}','{dbName}','{tableName}','{schema}','{createUser}',Null,{insert_time},Null,0);"
     try:
         cursor.execute(sql)
         sql = f'select id from data_set where name = "{name}" and descr="{descr}" and data_source_type="{dataSourceType}" and db_name="{dbName}" and table_name="{tableName}" and create_user="{createUser}" and create_time = {insert_time};'
@@ -81,7 +83,5 @@ def getschema(dataSetId):
         conn.rollback()
         schema = None
     # 查看更新后的结果
-    return schema
-
-
-print((getschema(25)[0]['schema_data']))
+    print(json.loads(schema[0]['schema_data']))
+    return schema[0]['schema_data']

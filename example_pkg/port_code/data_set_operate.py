@@ -4,7 +4,7 @@ import json
 
 from fastapi import APIRouter
 
-from example_pkg.MySQL.mysqlconfig import insertdata, getdataSetList, gettotalCount, deletedataSet
+from example_pkg.MySQL.mysqlconfig import insertdata, getdataSetList, gettotalCount, deletedataSet, getschema
 from example_pkg.Redis import RedisModel
 from example_pkg.click_house import databases
 from example_pkg.modules import Response
@@ -28,8 +28,11 @@ async def create_dataset(name: str, descr: str, dataSourceType: str, dbName: str
     try:
         dataSetId = insertdata(name=name, descr=descr, dataSourceType=dataSourceType, dbName=dbName,
                                tableName=tableName
-                               , schema=schema, createUser=createUser)
-        return Response(data={'dataSetId': dataSetId}).return_response()
+                               , schema=json.dumps(schema), createUser=createUser)
+        if dataSetId is not None:
+            return Response(data={'dataSetId': dataSetId}).return_response()
+        else:
+            return Response(data=None, msg='fail', code=110).return_response()
     except:
         return Response(data=None, msg='fail', code=110).return_response()
 
@@ -48,7 +51,8 @@ keyword:数据集名称或数据集descr关键字搜索
 async def dataset_list(orderBy: str, order: str, page: int, pageSize: int, creatUser: str, keyword: str):
     try:
         data = {}
-        dataSetList = getdataSetList(orderBy=orderBy, order=order, page=page, pageSize=pageSize, creatUser=creatUser, keyword=keyword)
+        dataSetList = getdataSetList(orderBy=orderBy, order=order, page=page, pageSize=pageSize, creatUser=creatUser,
+                                     keyword=keyword)
         totalCount = gettotalCount(creatUser=creatUser, keyword=keyword)
         data['dataSetList'] = dataSetList
         data['totalCount'] = totalCount
@@ -72,4 +76,22 @@ async def delete_dataset(id: int):
 
 @dbs_operate.post('./info')
 async def info_dataset(dataSetId: int):
-    pass
+    try:
+        schema_str = json.loads(getschema(dataSetId=dataSetId))
+        print(schema_str)
+        data = {}
+        dimensionList = []
+        metricList = []
+        functionList = []
+        for i in schema_str:
+            schema_dict = json.loads(i)
+            if schema_dict['isPartition']:
+                dimensionList.append(schema_dict)
+            else:
+                metricList.append(schema_dict)
+        data['dimensionList'] = dimensionList
+        data['metricList'] = metricList
+        data['functionList'] = functionList
+        return Response(data=data).return_response()
+    except:
+        return Response(data=False, msg='fail', code=110).return_response()
