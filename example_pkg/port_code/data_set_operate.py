@@ -28,7 +28,7 @@ async def create_dataset(name: str, descr: str, dataSourceType: str, dbName: str
     try:
         dataSetId = insertdata(name=name, descr=descr, dataSourceType=dataSourceType, dbName=dbName,
                                tableName=tableName
-                               , schema=json.dumps(schema), createUser=createUser)
+                               , schema=schema, createUser=createUser)
         if dataSetId is not None:
             return Response(data={'dataSetId': dataSetId}).return_response()
         else:
@@ -77,7 +77,7 @@ async def delete_dataset(id: int):
 @dbs_operate.post('./info')
 async def info_dataset(dataSetId: int):
     try:
-        schema_str = json.loads(getschema(dataSetId=dataSetId))
+        schema_str = getschema(dataSetId=dataSetId)
         print(schema_str)
         data = {}
         dimensionList = []
