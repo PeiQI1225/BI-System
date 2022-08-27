@@ -83,5 +83,4 @@ def getschema(dataSetId):
         conn.rollback()
         schema = None
     # 查看更新后的结果
-    print(json.loads(schema[0]['schema_data']))
-    return schema[0]['schema_data']
+    return schema

@@ -77,18 +77,18 @@ async def delete_dataset(id: int):
 @dbs_operate.post('./info')
 async def info_dataset(dataSetId: int):
     try:
-        schema_str = getschema(dataSetId=dataSetId)
-        print(schema_str)
+        schema_dict = getschema(dataSetId=dataSetId)[0]
+        schema_str = schema_dict['schema_data']
+        schema_list = eval(schema_str)
         data = {}
         dimensionList = []
         metricList = []
         functionList = []
-        for i in schema_str:
-            schema_dict = json.loads(i)
-            if schema_dict['isPartition']:
-                dimensionList.append(schema_dict)
+        for i in schema_list:
+            if i['isPartition']:
+                dimensionList.append(i)
             else:
-                metricList.append(schema_dict)
+                metricList.append(i)
         data['dimensionList'] = dimensionList
         data['metricList'] = metricList
         data['functionList'] = functionList
