@@ -45,7 +45,8 @@ if __name__ == "__main__":
         threads.append(t)
     for t in threads:
         time.sleep(ThinkTime)
-        t.setDaemon(True)
+        # t.setDaemon(True)
+        t.daemon = True
         t.start()
     t.join()
     endtime = datetime.datetime.now()
