@@ -75,7 +75,7 @@ def deletedataSet(id: int):
 
 def getschema(dataSetId):
     try:
-        sql = f"select schema_data from data_set where id = {dataSetId};"
+        sql = f"select * from data_set where id = {dataSetId};"
         cursor.execute(sql)
         schema = cursor.fetchall()
         conn.commit()

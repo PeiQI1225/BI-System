@@ -8,6 +8,7 @@ from example_pkg.MySQL.mysqlconfig import insertdata, getdataSetList, gettotalCo
 from example_pkg.Redis import RedisModel
 from example_pkg.click_house import databases
 from example_pkg.modules import Response
+from example_pkg.port_code.otherformat import formatSchema
 
 dbs_operate = APIRouter()
 
@@ -77,9 +78,8 @@ async def delete_dataset(id: int):
 @dbs_operate.post('./info')
 async def info_dataset(dataSetId: int):
     try:
-        schema_dict = getschema(dataSetId=dataSetId)[0]
-        schema_str = schema_dict['schema_data']
-        schema_list = eval(schema_str)
+        data_list = getschema(dataSetId=dataSetId)
+        schema_list = formatSchema(data_list)
         data = {}
         dimensionList = []
         metricList = []

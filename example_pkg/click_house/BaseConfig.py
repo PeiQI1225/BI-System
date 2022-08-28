@@ -59,10 +59,10 @@ class databases(client):
             datalist.append(schema)
         return datalist
 
-    # def Gettabledata(self, database, table, schema):
-    #     sql = f"select {schema} From {database}.{table}"
-    #     tabledata = self.client.execute(sql)
-    #     return tabledata
+    def Gettabledata(self, database, table, schema):
+        sql = f"select {schema} From {database}.{table}"
+        tabledata = self.client.execute(sql)
+        return tabledata
 
 #
 # a = databases(host="139.224.74.8", port=9000, user="default", password="2001G1225")
