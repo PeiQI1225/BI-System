@@ -1,4 +1,4 @@
-
+import os
 import time
 
 from typing import Optional, List
@@ -34,6 +34,6 @@ BI_system.include_router(database_operate.db_operate, prefix='/api/v1', tags=['�
 BI_system.include_router(data_set_operate.dbs_operate, prefix="/api/v1/dataset", tags=["数据集操作"])
 BI_system.include_router(other_operate.other_operate, prefix='/api/v1', tags=['其它操作'])
 
-
 if __name__ == '__main__':
     uvicorn.run('start:BI_system', host='127.0.0.1', port=8001, reload=True, debug=1, workers=1)
+    os.system('test/performance_text.py')
